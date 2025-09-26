@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Script de despliegue para Render
+
+echo "Instalando dependencias..."
+pip install -r requirements.txt
+
+echo "Aplicando migraciones..."
+python manage.py migrate
+
+echo "Recolectando archivos estáticos..."
+python manage.py collectstatic --noinput
+
+echo "Despliegue completado!"

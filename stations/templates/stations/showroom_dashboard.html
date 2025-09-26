@@ -1,0 +1,466 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Showroom - Monitoreo en Tiempo Real</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+         :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --dark-gradient: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            --cyber-blue: #00f3ff;
+            --cyber-purple: #b967ff;
+            --neon-green: #39ff14;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .cyber-font {
+            font-family: 'Orbitron', monospace;
+        }
+        /* Header estilo showroom */
+        
+        .showroom-header {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--cyber-blue);
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.3);
+        }
+        /* Tarjetas de datos con efecto neón */
+        
+        .data-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .data-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .data-card:hover::before {
+            left: 100%;
+        }
+        
+        .data-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 243, 255, 0.4);
+            border-color: var(--cyber-blue);
+        }
+        /* Valores numéricos grandes */
+        
+        .sensor-value {
+            font-size: 3.5rem;
+            font-weight: 900;
+            font-family: 'Orbitron', monospace;
+            background: linear-gradient(45deg, #00f3ff, #b967ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(0, 243, 255, 0.5);
+        }
+        
+        .sensor-unit {
+            font-size: 1.2rem;
+            color: var(--cyber-blue);
+            font-family: 'Orbitron', monospace;
+        }
+        /* Indicadores de estado */
+        
+        .status-indicator {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 10px;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-online {
+            background-color: var(--neon-green);
+        }
+        
+        .status-offline {
+            background-color: #ff4757;
+        }
+        
+        .status-warning {
+            background-color: #ffa502;
+        }
+        
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+        /* Gráficos simples CSS */
+        
+        .metric-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .metric-fill {
+            height: 100%;
+            background: var(--success-gradient);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        /* Efectos de partículas para fondo */
+        
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--cyber-blue);
+            border-radius: 50%;
+            animation: float 6s infinite linear;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(100px);
+                opacity: 0;
+            }
+        }
+        /* Timeline de eventos */
+        
+        .timeline {
+            border-left: 2px solid var(--cyber-blue);
+            padding-left: 20px;
+            margin-left: 10px;
+        }
+        
+        .timeline-event {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .timeline-event::before {
+            content: '';
+            position: absolute;
+            left: -26px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            background: var(--cyber-blue);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--cyber-blue);
+        }
+        /* Modo pantalla completa */
+        
+        .fullscreen-mode {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 10000;
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Partículas de fondo -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Header del Showroom -->
+    <header class="showroom-header py-3 sticky-top">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 class="cyber-font mb-0">
+                        <i class="fas fa-satellite"></i> SOLTECH MONITORING SYSTEM
+                    </h1>
+                    <small class="text-cyber">Sistema de Monitoreo en Tiempo Real</small>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="d-flex justify-content-end align-items-center">
+                        <span class="status-indicator status-online"></span>
+                        <span class="me-3">SISTEMA OPERATIVO</span>
+                        <span id="current-time" class="cyber-font"></span>
+                        <button class="btn btn-outline-cyber ms-3" onclick="toggleFullscreen()">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <div class="container-fluid mt-4">
+        <!-- Estadísticas Globales -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="data-card text-center p-4">
+                    <i class="fas fa-thermometer-half fa-3x mb-3" style="color: #ff6b6b;"></i>
+                    <h3 class="sensor-value" id="avg-temperature">--</h3>
+                    <p class="sensor-unit">TEMPERATURA PROMEDIO</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="data-card text-center p-4">
+                    <i class="fas fa-tint fa-3x mb-3" style="color: #4ecdc4;"></i>
+                    <h3 class="sensor-value" id="avg-humidity">--</h3>
+                    <p class="sensor-unit">HUMEDAD PROMEDIO</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="data-card text-center p-4">
+                    <i class="fas fa-tachometer-alt fa-3x mb-3" style="color: #45b7d1;"></i>
+                    <h3 class="sensor-value" id="avg-pressure">--</h3>
+                    <p class="sensor-unit">PRESIÓN ATMOSFÉRICA</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="data-card text-center p-4">
+                    <i class="fas fa-wind fa-3x mb-3" style="color: #96ceb4;"></i>
+                    <h3 class="sensor-value" id="active-stations">--</h3>
+                    <p class="sensor-unit">ESTACIONES ACTIVAS</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grid de Estaciones -->
+        <div class="row" id="stations-grid">
+            <!-- Las estaciones se cargarán aquí dinámicamente -->
+        </div>
+
+        <!-- Timeline de Eventos -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="data-card p-4">
+                    <h3 class="cyber-font mb-4">
+                        <i class="fas fa-history"></i> TIMELINE DE EVENTOS
+                    </h3>
+                    <div class="timeline" id="events-timeline">
+                        <!-- Eventos se cargarán aquí -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // Configuración de partículas de fondo
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (3 + Math.random() * 4) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Actualizar reloj en tiempo real
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('current-time').textContent =
+                now.toLocaleTimeString('es-ES', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+        }
+
+        // Modo pantalla completa
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        // Cargar datos de las estaciones
+        async function loadStationsData() {
+            try {
+                const response = await fetch('/stations/api/realtime-data/');
+                const data = await response.json();
+
+                updateDashboard(data);
+                updateStationsGrid(data.stations);
+                updateEventsTimeline(data.events);
+
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
+        }
+
+        // Actualizar estadísticas globales
+        function updateDashboard(data) {
+            document.getElementById('avg-temperature').textContent = data.avg_temperature ? data.avg_temperature.toFixed(1) : '--';
+            document.getElementById('avg-humidity').textContent = data.avg_humidity ? data.avg_humidity.toFixed(1) : '--';
+            document.getElementById('avg-pressure').textContent = data.avg_pressure ? data.avg_pressure.toFixed(1) : '--';
+            document.getElementById('active-stations').textContent = data.active_stations || '0';
+        }
+
+        // Actualizar grid de estaciones
+        function updateStationsGrid(stations) {
+            const grid = document.getElementById('stations-grid');
+            grid.innerHTML = '';
+
+            stations.forEach(station => {
+                const stationCard = `
+                    <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+                        <div class="data-card p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h4 class="cyber-font mb-0">
+                                    <span class="status-indicator status-${station.status}"></span>
+                                    ${station.station_id}
+                                </h4>
+                                <small class="text-cyber">${station.location}</small>
+                            </div>
+                            
+                            <div class="row text-center">
+                                <div class="col-4">
+                                    <div class="sensor-value">${station.temperature ? station.temperature.toFixed(1) : '--'}</div>
+                                    <div class="sensor-unit">°C</div>
+                                    <small>Temperatura</small>
+                                </div>
+                                <div class="col-4">
+                                    <div class="sensor-value">${station.humidity ? station.humidity.toFixed(1) : '--'}</div>
+                                    <div class="sensor-unit">%</div>
+                                    <small>Humedad</small>
+                                </div>
+                                <div class="col-4">
+                                    <div class="sensor-value">${station.pressure ? station.pressure.toFixed(1) : '--'}</div>
+                                    <div class="sensor-unit">hPa</div>
+                                    <small>Presión</small>
+                                </div>
+                            </div>
+
+                            <div class="metric-bar mt-3">
+                                <div class="metric-fill" style="width: ${station.quality || 75}%"></div>
+                            </div>
+                            <small>Calidad de datos: ${station.quality || 75}%</small>
+                            
+                            <div class="mt-3">
+                                <small class="text-muted">
+                                    <i class="fas fa-clock"></i> 
+                                    Última actualización: ${new Date(station.last_update).toLocaleTimeString()}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += stationCard;
+            });
+        }
+
+        // Actualizar timeline de eventos
+        function updateEventsTimeline(events) {
+            const timeline = document.getElementById('events-timeline');
+            timeline.innerHTML = '';
+
+            events.forEach(event => {
+                const eventElement = `
+                    <div class="timeline-event">
+                        <small class="text-cyber">${new Date(event.timestamp).toLocaleString()}</small>
+                        <p class="mb-1">${event.message}</p>
+                        <small class="text-muted">Estación: ${event.station_id}</small>
+                    </div>
+                `;
+                timeline.innerHTML += eventElement;
+            });
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            updateClock();
+            setInterval(updateClock, 1000);
+
+            // Cargar datos iniciales
+            loadStationsData();
+
+            // Actualizar cada 5 segundos
+            setInterval(loadStationsData, 5000);
+        });
+
+        // Efectos de teclado para presentación
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F11') {
+                e.preventDefault();
+                toggleFullscreen();
+            }
+            if (e.key === ' ') { // Espacio para pausar/play
+                // Implementar pausa de actualizaciones si es necesario
+            }
+        });
+    </script>
+</body>
+
+</html>

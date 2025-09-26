@@ -1,0 +1,51 @@
+{% extends 'base.html' %} {% block title %}Agregar Estación - Estaciones Meteo{% endblock %} {% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">
+                    <i class="fas fa-plus"></i> Agregar Nueva Estación
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label for="id_station_id" class="form-label">ID de la Estación</label> {{ form.station_id }}
+                        <div class="form-text">Identificador único para tu estación (ej: EST-001, CASA-001)</div>
+                        {% if form.station_id.errors %}
+                        <div class="text-danger">{{ form.station_id.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="id_location" class="form-label">Ubicación</label> {{ form.location }}
+                        <div class="form-text">Ubicación física de la estación (ej: Jardín trasero, Terraza, etc.)</div>
+                        {% if form.location.errors %}
+                        <div class="text-danger">{{ form.location.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="id_description" class="form-label">Descripción (Opcional)</label> {{ form.description }}
+                        <div class="form-text">Información adicional sobre la estación</div>
+                        {% if form.description.errors %}
+                        <div class="text-danger">{{ form.description.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> Guardar Estación
+                        </button>
+                        <a href="{% url 'stations:dashboard' %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

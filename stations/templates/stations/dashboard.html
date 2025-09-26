@@ -1,0 +1,82 @@
+{% extends 'base.html' %} {% block title %}Dashboard - Estaciones Meteo{% endblock %} {% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+    <a href="{% url 'stations:add_station' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Agregar Estación
+    </a>
+</div>
+
+{% if user_stations %}
+<div class="row">
+    {% for station in user_stations %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card station-card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-weather-station"></i> {{ station.station_id }}
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    <i class="fas fa-map-marker-alt"></i> {{ station.location }}
+                </p>
+
+                {% if station.description %}
+                <p class="card-text text-muted small">{{ station.description }}</p>
+                {% endif %}
+
+                <hr> {% with station_data|get_item:station.station_id as data %} {% if data %}
+                <h6>Última lectura:</h6>
+                {% for reading in data|slice:":1" %}
+                <div class="row small">
+                    {% if reading.temperature %}
+                    <div class="col-6 mb-2">
+                        <i class="fas fa-thermometer-half text-danger"></i> {{ reading.temperature|floatformat:1 }}°C
+                    </div>
+                    {% endif %} {% if reading.humidity_aht20 %}
+                    <div class="col-6 mb-2">
+                        <i class="fas fa-tint text-primary"></i> {{ reading.humidity_aht20|floatformat:1 }}%
+                    </div>
+                    {% endif %} {% if reading.pressure_bmp280 %}
+                    <div class="col-6 mb-2">
+                        <i class="fas fa-tachometer-alt text-info"></i> {{ reading.pressure_bmp280|floatformat:1 }} hPa
+                    </div>
+                    {% endif %}
+                </div>
+                <small class="text-muted">
+                                {{ reading.timestamp|timesince }} ago
+                            </small> {% endfor %} {% else %}
+                <p class="text-muted">No hay datos disponibles</p>
+                {% endif %} {% endwith %}
+            </div>
+            <div class="card-footer">
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'stations:station_detail' station.station_id %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-chart-line"></i> Ver Datos
+                    </a>
+                    <a href="{% url 'stations:add_station_data' station.station_id %}" class="btn btn-sm btn-outline-success">
+                        <i class="fas fa-plus"></i> Agregar Datos
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5">
+    <i class="fas fa-cloud fa-5x text-muted mb-4"></i>
+    <h3>No tienes estaciones registradas</h3>
+    <p class="text-muted mb-4">Comienza agregando tu primera estación meteorológica.</p>
+    <a href="{% url 'stations:add_station' %}" class="btn btn-primary btn-lg">
+        <i class="fas fa-plus"></i> Agregar Primera Estación
+    </a>
+</div>
+{% endif %} {% endblock %} {% block extra_js %}
+<script>
+    // Filtro personalizado para acceder a diccionarios en templates
+    function get_item(dictionary, key) {
+        return dictionary[key];
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,943 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SolyLluvia Tech - Monitoreo Meteorológico</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+         :root {
+            --sun-gold: #FFD700;
+            --sun-orange: #FF8C00;
+            --rain-blue: #1E90FF;
+            --rain-dark-blue: #0066CC;
+            --tech-purple: #8A2BE2;
+            --tech-cyan: #00CED1;
+            --nature-green: #32CD32;
+            --nature-dark-green: #228B22;
+            --background-dark: #0A0F2D;
+            --card-bg: rgba(255, 255, 255, 0.08);
+            /* Variables responsivas */
+            --mobile-font-scale: 0.7;
+            --tablet-font-scale: 0.85;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, var(--background-dark) 0%, #1A237E 50%, #283593 100%);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-attachment: fixed;
+            padding-bottom: 20px;
+        }
+        
+        .cyber-font {
+            font-family: 'Orbitron', monospace;
+        }
+        /* Header responsive */
+        
+        .showroom-header {
+            background: linear-gradient(90deg, var(--sun-orange) 0%, var(--sun-gold) 25%, var(--rain-blue) 50%, var(--tech-purple) 75%, var(--nature-green) 100%);
+            backdrop-filter: blur(10px);
+            border-bottom: 3px solid var(--tech-cyan);
+            box-shadow: 0 0 30px rgba(30, 144, 255, 0.5);
+            position: relative;
+            overflow: hidden;
+            padding: 10px 0;
+        }
+        
+        .showroom-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" opacity="0.1"><path d="M50,15 A35,35 0 1,1 50,85 A35,35 0 1,1 50,15 Z" fill="white"/><circle cx="50" cy="50" r="10" fill="white"/></svg>') repeat;
+            animation: float 20s infinite linear;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            text-align: center;
+        }
+        
+        .logo {
+            height: 50px;
+            width: auto;
+            filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.7));
+        }
+        
+        .company-name {
+            font-family: 'Orbitron', monospace;
+            font-weight: 900;
+            font-size: 1.5rem;
+            background: linear-gradient(45deg, var(--sun-gold), var(--rain-blue), var(--tech-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(30, 144, 255, 0.5);
+            line-height: 1.2;
+        }
+        
+        .tagline {
+            font-size: 0.8rem;
+            opacity: 0.9;
+            font-style: italic;
+            width: 100%;
+        }
+        
+        .status-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        /* Tarjetas principales responsive */
+        
+        .main-data-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 2px solid;
+            border-image: linear-gradient(45deg, var(--sun-gold), var(--rain-blue), var(--tech-purple)) 1;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            margin: 15px 0;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            padding: 20px 15px;
+        }
+        
+        .main-data-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.1), transparent);
+            transition: left 0.8s;
+        }
+        
+        .main-data-card:hover::before {
+            left: 100%;
+        }
+        
+        .main-data-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+        /* Valores de sensores responsive */
+        
+        .main-sensor-value {
+            font-size: 2.5rem;
+            font-weight: 900;
+            font-family: 'Orbitron', monospace;
+            background: linear-gradient(45deg, var(--sun-gold), var(--sun-orange), var(--rain-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            animation: glow 3s ease-in-out infinite alternate;
+            line-height: 1.2;
+        }
+        
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+            }
+            to {
+                text-shadow: 0 0 25px rgba(30, 144, 255, 0.7), 0 0 35px rgba(138, 43, 226, 0.5);
+            }
+        }
+        
+        .sensor-unit {
+            font-size: 1.2rem;
+            color: var(--tech-cyan);
+            font-family: 'Orbitron', monospace;
+        }
+        /* Tarjetas de sensores individuales responsive */
+        
+        .sensor-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 8px 5px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+        
+        .sensor-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--sun-gold), var(--rain-blue), var(--nature-green));
+        }
+        
+        .sensor-card:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .sensor-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .temperature-icon {
+            color: var(--sun-orange);
+        }
+        
+        .humidity-icon {
+            color: var(--rain-blue);
+        }
+        
+        .pressure-icon {
+            color: var(--tech-purple);
+        }
+        
+        .gas-icon {
+            color: var(--nature-green);
+        }
+        
+        .sensor-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: 'Orbitron', monospace;
+            line-height: 1.2;
+        }
+        /* Indicadores de estado */
+        
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .status-live {
+            background-color: var(--nature-green);
+        }
+        
+        .status-offline {
+            background-color: #FF6B6B;
+            animation: none;
+        }
+        
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: scale(1.1);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        /* Efectos de partículas */
+        
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            animation: float 8s infinite linear;
+        }
+        
+        .sun-particle {
+            width: 3px;
+            height: 3px;
+            background: var(--sun-gold);
+            box-shadow: 0 0 8px var(--sun-gold);
+        }
+        
+        .rain-particle {
+            width: 2px;
+            height: 8px;
+            background: var(--rain-blue);
+            box-shadow: 0 0 4px var(--rain-blue);
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(100px);
+                opacity: 0;
+            }
+        }
+        /* Botones de control responsive */
+        
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid var(--tech-cyan);
+            color: var(--tech-cyan);
+            border-radius: 20px;
+            padding: 8px 20px;
+            font-family: 'Orbitron', monospace;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin: 5px;
+            font-size: 0.9rem;
+            width: 100%;
+            max-width: 250px;
+        }
+        
+        .control-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 206, 209, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .control-btn:hover::before {
+            left: 100%;
+        }
+        
+        .control-btn:hover {
+            background: var(--tech-cyan);
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 206, 209, 0.4);
+        }
+        
+        .no-data {
+            color: #FF6B6B !important;
+            font-style: italic;
+        }
+        
+        .quality-excellent {
+            color: var(--nature-green);
+        }
+        
+        .quality-good {
+            color: #4cd964;
+        }
+        
+        .quality-fair {
+            color: #ffcc00;
+        }
+        
+        .quality-poor {
+            color: #FF6B6B;
+        }
+        /* Footer responsive */
+        
+        .company-footer {
+            background: rgba(0, 0, 0, 0.7);
+            border-top: 1px solid var(--tech-cyan);
+            padding: 15px 0;
+            margin-top: 30px;
+        }
+        
+        .social-links a {
+            color: var(--tech-cyan);
+            font-size: 1.3rem;
+            margin: 0 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            color: var(--sun-gold);
+            transform: translateY(-3px);
+        }
+        /* Media Queries para Responsividad */
+        /* Pantallas pequeñas (móviles) */
+        
+        @media (max-width: 576px) {
+            .main-data-card h2 {
+                font-size: 1.2rem !important;
+                line-height: 1.3;
+            }
+            .main-sensor-value {
+                font-size: 1.8rem !important;
+                line-height: 1.2;
+            }
+            .sensor-value {
+                font-size: 1.1rem !important;
+            }
+            .sensor-card {
+                margin: 5px 0;
+                padding: 10px;
+            }
+            /* ESPECÍFICO para la tarjeta de información de estación */
+            .station-info-card .row {
+                margin: 0;
+            }
+            .station-info-card .col-6 {
+                margin-bottom: 15px;
+            }
+            .station-info-card .sensor-value {
+                font-size: 1rem !important;
+                margin-bottom: 5px;
+            }
+            /* Asegurar que el texto no se corte */
+            .company-name,
+            .tagline,
+            h2,
+            h3,
+            h4,
+            h5 {
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+            }
+        }
+        /* Pantallas medianas (tabletas) */
+        
+        @media (min-width: 577px) and (max-width: 768px) {
+            .company-name {
+                font-size: 1.6rem;
+            }
+            .main-sensor-value {
+                font-size: 3rem;
+            }
+            .sensor-value {
+                font-size: 1.7rem;
+            }
+            .main-data-card {
+                padding: 25px 20px;
+            }
+        }
+        /* Pantallas grandes */
+        
+        @media (max-width: 768px) {
+            .container-fluid {
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+            .main-data-card {
+                margin: 10px 5px;
+                padding: 15px 10px;
+            }
+        }
+        /* Ajustes específicos para orientación horizontal en móviles */
+        
+        @media (max-height: 500px) and (orientation: landscape) {
+            .main-data-card {
+                padding: 10px 15px;
+                margin: 5px 0;
+            }
+            .main-sensor-value {
+                font-size: 1.8rem;
+            }
+            .sensor-value {
+                font-size: 1.2rem;
+            }
+            .sensor-icon {
+                font-size: 1.5rem;
+                margin-bottom: 5px;
+            }
+            .company-footer {
+                margin-top: 15px;
+                padding: 10px 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Partículas de fondo con temática de sol y lluvia -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Header del Showroom -->
+    <header class="showroom-header py-2">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-12 col-md-8">
+                    <div class="logo-container">
+                        <img src="{% static 'images/logo.png' %}" alt="SolyLluvia Tech" class="logo">
+                        <div>
+                            <h1 class="company-name mb-1">SOLYLLUVIA TECH</h1>
+                            <p class="tagline mb-0">Un futuro sostenible al alcance de todos</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div class="status-container">
+                        <span class="status-indicator {% if has_data %}status-live{% else %}status-offline{% endif %}" id="status-indicator"></span>
+                        <span class="me-3" id="status-text">{% if has_data %}TRANSMISIÓN EN VIVO{% else %}SIN CONEXIÓN{% endif %}</span>
+                        <span id="current-time" class="cyber-font">{{ timestamp|time:"H:i:s" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <div class="container-fluid mt-4">
+        <!-- Datos Principales -->
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-10">
+                <div class="main-data-card p-3 p-md-4 text-center">
+                    <h2 class="cyber-font mb-3 mb-md-4">
+                        <i class="fas fa-cloud-sun-rain"></i> {% if has_data %} MONITOREO EN TIEMPO REAL {% else %} SISTEMA DE MONITOREO METEOROLÓGICO {% endif %}
+                    </h2>
+
+                    <div class="row align-items-center mb-3 mb-md-4">
+                        <!-- Temperatura -->
+                        <div class="col-12 col-md-4 mb-3 mb-md-0">
+                            <div class="sensor-card">
+                                <div class="sensor-icon temperature-icon">
+                                    <i class="fas fa-sun"></i>
+                                </div>
+                                <div class="main-sensor-value {% if not has_data %}no-data{% endif %}" id="current-temperature">
+                                    {% if latest_data %} {% if latest_data.temperature_aht20 %} {{ latest_data.temperature_aht20|floatformat:1 }} {% elif latest_data.temperature_bmp280 %} {{ latest_data.temperature_bmp280|floatformat:1 }} {% else %} -- {% endif %} {% else %} -- {% endif%}
+                                </div>
+                                <div class="sensor-unit">°C</div>
+                                <small>TEMPERATURA</small>
+                            </div>
+                        </div>
+
+                        <!-- Humedad -->
+                        <div class="col-12 col-md-4 mb-3 mb-md-0">
+                            <div class="sensor-card">
+                                <div class="sensor-icon humidity-icon">
+                                    <i class="fas fa-tint"></i>
+                                </div>
+                                <div class="main-sensor-value {% if not has_data %}no-data{% endif %}" id="current-humidity">
+                                    {% if latest_data and latest_data.humidity_aht20 %} {{ latest_data.humidity_aht20|floatformat:1 }} {% else %} -- {% endif %}
+                                </div>
+                                <div class="sensor-unit">%</div>
+                                <small>HUMEDAD</small>
+                            </div>
+                        </div>
+
+                        <!-- Presión -->
+                        <div class="col-12 col-md-4">
+                            <div class="sensor-card">
+                                <div class="sensor-icon pressure-icon">
+                                    <i class="fas fa-tachometer-alt"></i>
+                                </div>
+                                <div class="main-sensor-value {% if not has_data %}no-data{% endif %}" id="current-pressure">
+                                    {% if latest_data and latest_data.pressure_bmp280 %} {{ latest_data.pressure_bmp280|floatformat:0 }} {% else %} -- {% endif %}
+                                </div>
+                                <div class="sensor-unit">hPa</div>
+                                <small>PRESIÓN ATMOSFÉRICA</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información de la estación -->
+                    <div class="row mt-3 mt-md-4">
+                        <div class="col-12">
+                            <div class="sensor-card station-info-card">
+                                <h4 class="cyber-font mb-3 text-center">
+                                    <i class="fas fa-satellite-dish"></i> INFORMACIÓN DE LA ESTACIÓN
+                                </h4>
+                                <div class="row text-center">
+                                    <div class="col-6 col-md-3 mb-3">
+                                        <div class="sensor-value" id="station-id">albacsd4</div>
+                                        <small class="d-block">ID ESTACIÓN</small>
+                                    </div>
+                                    <div class="col-6 col-md-3 mb-3">
+                                        <div class="sensor-value" id="station-location">prueba</div>
+                                        <small class="d-block">UBICACIÓN</small>
+                                    </div>
+                                    <div class="col-6 col-md-3 mb-3">
+                                        <div class="sensor-value" id="last-update">
+                                            02:28:51<br>
+                                            <small>24/09/2023</small>
+                                        </div>
+                                        <small class="d-block">ÚLTIMA ACTUALIZACIÓN</small>
+                                    </div>
+                                    <div class="col-6 col-md-3 mb-3">
+                                        <div class="sensor-value quality-excellent" id="data-quality">95%</div>
+                                        <small class="d-block">CALIDAD DE DATOS</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sensores Adicionales -->
+        <div class="row justify-content-center mt-3 mt-md-4">
+            <div class="col-12 col-lg-8">
+                <div class="main-data-card p-3 p-md-4">
+                    <h3 class="cyber-font text-center mb-3 mb-md-4">
+                        <i class="fas fa-microchip"></i> SENSORES DE CALIDAD DEL AIRE
+                    </h3>
+
+                    <div class="row">
+                        <!-- Sensor MQ-2 -->
+                        <div class="col-12 col-md-6 mb-3 mb-md-0">
+                            <div class="sensor-card">
+                                <h5><i class="fas fa-wind gas-icon"></i> SENSOR MQ-2 (GASES INFLAMABLES)</h5>
+                                <div class="row text-center">
+                                    <div class="col-6">
+                                        <div class="sensor-value {% if not has_data %}no-data{% endif %}" id="mq2-voltage">
+                                            {% if latest_data and latest_data.voltage_mq2 %} {{ latest_data.voltage_mq2|floatformat:2 }} {% else %} -- {% endif %}
+                                        </div>
+                                        <small>VOLTAJE (V)</small>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="sensor-value {% if not has_data %}no-data{% endif %}" id="mq2-digital">
+                                            {% if latest_data and latest_data.digital_mq2 is not None %} {% if latest_data.digital_mq2 %}
+                                            <span class="text-success">DETECTADO</span> {% else %}
+                                            <span class="text-warning">NORMAL</span> {% endif %} {% else %} -- {% endif %}
+                                        </div>
+                                        <small>ESTADO</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sensor MQ-135 -->
+                        <div class="col-12 col-md-6">
+                            <div class="sensor-card">
+                                <h5><i class="fas fa-smog gas-icon"></i> SENSOR MQ-135 (CALIDAD DEL AIRE)</h5>
+                                <div class="row text-center">
+                                    <div class="col-6">
+                                        <div class="sensor-value {% if not has_data %}no-data{% endif %}" id="mq135-voltage">
+                                            {% if latest_data and latest_data.voltage_mq135 %} {{ latest_data.voltage_mq135|floatformat:2 }} {% else %} -- {% endif %}
+                                        </div>
+                                        <small>VOLTAJE (V)</small>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="sensor-value {% if not has_data %}no-data{% endif %}" id="mq135-digital">
+                                            {% if latest_data and latest_data.digital_mq135 is not None %} {% if latest_data.digital_mq135 %}
+                                            <span class="text-success">ALERTA</span> {% else %}
+                                            <span class="text-warning">NORMAL</span> {% endif %} {% else %} -- {% endif %}
+                                        </div>
+                                        <small>CALIDAD</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controles de Presentación -->
+        <div class="row justify-content-center mt-3 mt-md-4">
+            <div class="col-12 col-lg-8 text-center">
+                <div class="d-flex flex-column flex-md-row justify-content-center align-items-center">
+                    <button class="control-btn me-md-3 mb-2 mb-md-0" onclick="toggleFullscreen()">
+                        <i class="fas fa-expand"></i> PANTALLA COMPLETA
+                    </button>
+                    <button class="control-btn me-md-3 mb-2 mb-md-0" onclick="refreshData()">
+                        <i class="fas fa-sync-alt"></i> ACTUALIZAR DATOS
+                    </button>
+                    <button class="control-btn" onclick="toggleAutoRefresh()">
+                        <i class="fas fa-clock"></i> <span id="auto-refresh-text">AUTO: ON</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer de la empresa -->
+    <footer class="company-footer">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-12 col-md-6 text-center text-md-start mb-3 mb-md-0">
+                    <h5 class="cyber-font">SOLYLLUVIA TECH</h5>
+                    <p class="mb-1">Un futuro sostenible al alcance de todos</p>
+                    <p class="mb-1">Mérida - Venezuela</p>
+                    <p class="mb-0">sollluviayteenologia@gmail.com</p>
+                </div>
+                <div class="col-12 col-md-6 text-center text-md-end">
+                    <div class="social-links mb-2">
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                    <p class="mt-2 mb-0">@solylluvia_tech</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Variables globales
+        let autoRefreshInterval = null;
+        let isAutoRefreshEnabled = true;
+
+        // Configuración de partículas de fondo con temática de sol y lluvia
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            // Partículas de sol (doradas)
+            for (let i = 0; i < 15; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle sun-particle';
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                particle.style.animationDuration = (6 + Math.random() * 6) + 's';
+                particlesContainer.appendChild(particle);
+            }
+            // Partículas de lluvia (azules)
+            for (let i = 0; i < 25; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle rain-particle';
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                particle.style.animationDuration = (4 + Math.random() * 4) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Actualizar reloj en tiempo real
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('current-time').textContent =
+                now.toLocaleTimeString('es-ES', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+        }
+
+        // Modo pantalla completa
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log(`Error attempting to enable fullscreen: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        // Cargar datos más recientes via API
+        async function loadLatestData() {
+            try {
+                const response = await fetch('/stations/api/public/latest-data/');
+                if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+
+                const data = await response.json();
+                updateDisplay(data);
+
+            } catch (error) {
+                console.error('Error loading data:', error);
+                showErrorMessage('Error de conexión con el servidor');
+            }
+        }
+
+        // Actualizar la interfaz con datos de la API
+        function updateDisplay(data) {
+            if (data && data.status === 'success' && data.station_data) {
+                const sd = data.station_data;
+                const station = data.station_info;
+
+                // Función para formatear valores
+                const formatValue = (value, decimals = 1) => {
+                    if (value === null || value === undefined || value === '--') return '--';
+                    return parseFloat(value).toFixed(decimals);
+                };
+
+                // Actualizar datos principales
+                document.getElementById('current-temperature').textContent =
+                    formatValue(sd.temperature_aht20 || sd.temperature_bmp280);
+                document.getElementById('current-humidity').textContent =
+                    formatValue(sd.humidity_aht20);
+                document.getElementById('current-pressure').textContent =
+                    formatValue(sd.pressure_bmp280, 0);
+
+                // Información de la estación
+                if (station && station.station_id) {
+                    document.getElementById('station-id').textContent = station.station_id;
+                    document.getElementById('station-location').textContent = station.location || '--';
+                }
+
+                if (sd.timestamp) {
+                    const updateTime = new Date(sd.timestamp);
+                    document.getElementById('last-update').innerHTML =
+                        updateTime.toLocaleTimeString('es-ES') + '<br>' +
+                        '<small>' + updateTime.toLocaleDateString('es-ES') + '</small>';
+                }
+
+                document.getElementById('data-quality').textContent = '95%';
+                document.getElementById('data-quality').className = 'sensor-value quality-excellent';
+
+                // Sensores adicionales
+                document.getElementById('mq2-voltage').textContent = formatValue(sd.voltage_mq2, 2);
+                document.getElementById('mq2-digital').innerHTML =
+                    sd.digital_mq2 !== null ?
+                    (sd.digital_mq2 ? '<span class="text-success">DETECTADO</span>' : '<span class="text-warning">NORMAL</span>') : '--';
+
+                document.getElementById('mq135-voltage').textContent = formatValue(sd.voltage_mq135, 2);
+                document.getElementById('mq135-digital').innerHTML =
+                    sd.digital_mq135 !== null ?
+                    (sd.digital_mq135 ? '<span class="text-success">ALERTA</span>' : '<span class="text-warning">NORMAL</span>') : '--';
+
+                // Actualizar estado de conexión
+                document.getElementById('status-indicator').className = 'status-indicator status-live';
+                document.getElementById('status-text').textContent = 'TRANSMISIÓN EN VIVO';
+
+            } else if (data && data.status === 'no_data') {
+                showNoDataMessage();
+            } else {
+                showErrorMessage('Datos no disponibles');
+            }
+        }
+
+        // Mostrar mensaje cuando no hay datos
+        function showNoDataMessage() {
+            document.getElementById('status-indicator').className = 'status-indicator status-offline';
+            document.getElementById('status-text').textContent = 'SIN DATOS';
+            document.getElementById('data-quality').className = 'sensor-value quality-poor';
+            document.getElementById('data-quality').textContent = '0%';
+        }
+
+        // Mostrar mensaje de error
+        function showErrorMessage(message) {
+            // Puedes implementar notificaciones toast aquí si lo deseas
+            console.warn(message);
+        }
+
+        // Refrescar datos manualmente
+        function refreshData() {
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ACTUALIZANDO...';
+            btn.disabled = true;
+
+            loadLatestData();
+
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }, 1000);
+        }
+
+        // Alternar actualización automática
+        function toggleAutoRefresh() {
+            isAutoRefreshEnabled = !isAutoRefreshEnabled;
+
+            if (isAutoRefreshEnabled) {
+                startAutoRefresh();
+                document.getElementById('auto-refresh-text').textContent = 'AUTO: ON';
+            } else {
+                stopAutoRefresh();
+                document.getElementById('auto-refresh-text').textContent = 'AUTO: OFF';
+            }
+        }
+
+        // Iniciar actualización automática
+        function startAutoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+            }
+            autoRefreshInterval = setInterval(loadLatestData, 10000); // 10 segundos
+        }
+
+        // Detener actualización automática
+        function stopAutoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
+            }
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            updateClock();
+            setInterval(updateClock, 1000);
+
+            // Si hay datos iniciales, cargar actualizaciones automáticamente
+
+
+            // Cargar datos iniciales via API (para asegurar que estén actualizados)
+            loadLatestData();
+
+            // Efectos de teclado para presentación
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'F11') {
+                    e.preventDefault();
+                    toggleFullscreen();
+                }
+                if (e.key === 'r' || e.key === 'R') {
+                    if (e.ctrlKey) {
+                        toggleAutoRefresh();
+                    } else {
+                        refreshData();
+                    }
+                }
+                if (e.key === ' ') {
+                    e.preventDefault();
+                    toggleFullscreen();
+                }
+            });
+
+            // Detectar cambios de visibilidad de la página
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden) {
+                    stopAutoRefresh();
+                } else if (isAutoRefreshEnabled) {
+                    startAutoRefresh();
+                    loadLatestData(); // Cargar datos inmediatamente al volver
+                }
+            });
+        });
+
+        // Limpiar intervalo al cerrar la página
+        window.addEventListener('beforeunload', function() {
+            stopAutoRefresh();
+        });
+    </script>
+</body>
+
+</html>

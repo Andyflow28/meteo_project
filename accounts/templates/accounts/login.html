@@ -1,0 +1,38 @@
+{% extends 'base.html' %} {% block title %}Iniciar Sesión - Estaciones Meteo{% endblock %} {% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">
+                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label for="id_username" class="form-label">Usuario o Email</label>
+                        <input type="text" name="username" class="form-control" id="id_username" placeholder="Nombre de usuario o correo electrónico" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="id_password" class="form-label">Contraseña</label>
+                        <input type="password" name="password" class="form-control" id="id_password" placeholder="Contraseña" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                    </button>
+                </form>
+
+                <hr>
+
+                <div class="text-center">
+                    <p>¿No tienes una cuenta? <a href="{% url 'accounts:register' %}">Regístrate aquí</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
