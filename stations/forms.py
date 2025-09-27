@@ -4,7 +4,7 @@ from .models import UserStation, StationData
 class UserStationForm(forms.ModelForm):
     class Meta:
         model = UserStation
-        fields = ['station_id', 'location', 'description']
+        fields = ['station_id', 'location']  # QUITAR 'description' que no existe
         widgets = {
             'station_id': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -14,11 +14,7 @@ class UserStationForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Ubicación física de la estación'
             }),
-            'description': forms.Textarea(attrs={
-                'class': 'form-control',
-                'placeholder': 'Descripción opcional de la estación',
-                'rows': 3
-            }),
+            # QUITAR el widget de description que no existe
         }
 
 class StationDataForm(forms.ModelForm):

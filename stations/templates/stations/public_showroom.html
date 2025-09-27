@@ -719,11 +719,6 @@
             setInterval(updateClock, 1000);
 
             // Iniciar actualización automática si hay datos
-            { %
-                if has_data %
-            }
-            startAutoRefresh(); { % endif %
-            }
 
             // Cargar datos iniciales via API
             loadLatestData();

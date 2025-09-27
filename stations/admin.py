@@ -6,6 +6,7 @@ class UserStationAdmin(admin.ModelAdmin):
     list_display = ('station_id', 'location', 'user')
     list_filter = ('user',)
     search_fields = ('station_id', 'location', 'user__username', 'user__email')
+    # Quitar cualquier referencia a description o created_at
 
 @admin.register(StationData)
 class StationDataAdmin(admin.ModelAdmin):

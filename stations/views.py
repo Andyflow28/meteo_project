@@ -7,18 +7,16 @@ from .models import UserStation, StationData
 from .forms import UserStationForm, StationDataForm
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from django.db import connection
-from django.http import JsonResponse
 import json
 
 
 @never_cache
 def public_showroom(request):
-    """Vista pública para showroom - usando consultas SQL directas que coincidan con la BD"""
+    """Vista pública para showroom - corregida para BD real"""
     try:
-        # Consulta directa que funciona con la estructura actual de la BD
+        # Consulta directa a station_data
         with connection.cursor() as cursor:
             cursor.execute("""
                 SELECT * FROM station_data 
@@ -32,12 +30,12 @@ def public_showroom(request):
         if latest_data_row:
             latest_data = dict(zip(columns, latest_data_row))
         
-        # Obtener información de la estación (solo campos existentes)
+        # Obtener información de la estación (SOLO CAMPOS EXISTENTES)
         station_info = None
         if latest_data and 'station_id' in latest_data:
             with connection.cursor() as cursor:
                 cursor.execute("""
-                    SELECT station_id, location, description 
+                    SELECT station_id, location  -- SOLO CAMPOS QUE EXISTEN
                     FROM user_stations 
                     WHERE station_id = %s
                 """, [latest_data['station_id']])
@@ -46,34 +44,40 @@ def public_showroom(request):
                     station_info = {
                         'station_id': station_row[0],
                         'location': station_row[1],
-                        'description': station_row[2] if len(station_row) > 2 else ''
+                        # NO INCLUIR description QUE NO EXISTE
                     }
         
         # Convertir a objeto StationData para la plantilla
         station_data_obj = None
         if latest_data:
-            station_data_obj = StationData(
-                id=latest_data.get('id'),
-                temperatura=latest_data.get('temperatura'),
-                humedad=latest_data.get('humedad'),
-                presion=latest_data.get('presion'),
-                gas_detectado=latest_data.get('gas_detectado'),
-                voltaje_mq135=latest_data.get('voltaje_mq135'),
-                indice_uv=latest_data.get('indice_uv'),
-                nivel_uv=latest_data.get('nivel_uv'),
-                timestamp=latest_data.get('timestamp')
-            )
-            # Asignar la estación si existe
-            if station_info:
-                station_data_obj.station = UserStation(
-                    station_id=station_info['station_id'],
-                    location=station_info['location'],
-                    description=station_info.get('description', '')
-                )
+            # Crear objeto mock para evitar errores de base de datos
+            class MockStationData:
+                def __init__(self, data):
+                    self.temperatura = data.get('temperatura')
+                    self.humedad = data.get('humedad')
+                    self.presion = data.get('presion')
+                    self.gas_detectado = data.get('gas_detectado')
+                    self.voltaje_mq135 = data.get('voltaje_mq135')
+                    self.indice_uv = data.get('indice_uv')
+                    self.nivel_uv = data.get('nivel_uv')
+                    self.timestamp = data.get('timestamp')
+                    
+                    # Mock station solo con campos existentes
+                    if station_info:
+                        class MockStation:
+                            def __init__(self, info):
+                                self.station_id = info.get('station_id')
+                                self.location = info.get('location')
+                                # NO agregar description que no existe
+                        self.station = MockStation(station_info)
+                    else:
+                        self.station = None
+            
+            station_data_obj = MockStationData(latest_data)
         
         context = {
             'latest_data': station_data_obj,
-            'station': station_data_obj.station if station_data_obj and hasattr(station_data_obj, 'station') else None,
+            'station': station_data_obj.station if station_data_obj else None,
             'has_data': latest_data is not None,
             'timestamp': timezone.now(),
         }
@@ -93,7 +97,7 @@ def public_showroom(request):
 
 @never_cache
 def public_latest_data_api(request):
-    """API pública usando consultas SQL directas que coincidan con la BD real"""
+    """API pública - corregida para BD real"""
     try:
         with connection.cursor() as cursor:
             cursor.execute("""
@@ -107,12 +111,12 @@ def public_latest_data_api(request):
         if latest_data_row:
             latest_data = dict(zip(columns, latest_data_row))
             
-            # Obtener información de la estación (solo campos existentes)
+            # Obtener información de la estación (SOLO CAMPOS EXISTENTES)
             station_info = {}
             if 'station_id' in latest_data:
                 with connection.cursor() as cursor:
                     cursor.execute("""
-                        SELECT station_id, location, description 
+                        SELECT station_id, location  -- SOLO CAMPOS QUE EXISTEN
                         FROM user_stations 
                         WHERE station_id = %s
                     """, [latest_data['station_id']])
@@ -121,7 +125,7 @@ def public_latest_data_api(request):
                         station_info = {
                             'station_id': station_row[0],
                             'location': station_row[1],
-                            'description': station_row[2] if len(station_row) > 2 else ''
+                            # NO INCLUIR description
                         }
             
             data = {
@@ -261,14 +265,12 @@ def showroom_dashboard(request):
 def realtime_data_api(request):
     """API para datos en tiempo real del showroom"""
     try:
-        # Obtener todas las estaciones con sus últimos datos usando consultas directas
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT station_id, location, description FROM user_stations")
-            stations_data = cursor.fetchall()
+        # Obtener todas las estaciones con sus últimos datos
+        stations = UserStation.objects.all()
         
         data = {
             'timestamp': timezone.now().isoformat(),
-            'active_stations': len(stations_data),
+            'active_stations': stations.count(),
             'stations': [],
             'events': [],
             'avg_temperature': None,
@@ -280,30 +282,22 @@ def realtime_data_api(request):
         humidities = []
         pressures = []
         
-        for station_row in stations_data:
-            station_id, location, description = station_row
-            
+        for station in stations:
             # Obtener último dato de la estación
-            with connection.cursor() as cursor:
-                cursor.execute("""
-                    SELECT temperatura, humedad, presion, timestamp 
-                    FROM station_data 
-                    WHERE station_id = %s 
-                    ORDER BY timestamp DESC 
-                    LIMIT 1
-                """, [station_id])
-                latest_row = cursor.fetchone()
+            latest_data = StationData.objects.filter(station=station).order_by('-timestamp').first()
             
-            if latest_row:
-                temperatura, humedad, presion, timestamp = latest_row
-                
+            if latest_data:
                 station_data = {
-                    'station_id': station_id,
-                    'location': location,
-                    'temperature': temperatura,
-                    'humidity': humedad,
-                    'pressure': presion,
-                    'last_update': timestamp.isoformat() if timestamp else None,
+                    'station_id': station.station_id,
+                    'location': station.location,
+                    'temperature': latest_data.temperatura,
+                    'humidity': latest_data.humedad,
+                    'pressure': latest_data.presion,
+                    'gas_detectado': latest_data.gas_detectado,
+                    'voltaje_mq135': latest_data.voltaje_mq135,
+                    'indice_uv': latest_data.indice_uv,
+                    'nivel_uv': latest_data.nivel_uv,
+                    'last_update': latest_data.timestamp.isoformat() if latest_data.timestamp else None,
                     'status': 'online',
                     'quality': 95,
                 }
@@ -348,39 +342,33 @@ def api_receive_data(request):
                         'message': f'Campo requerido faltante: {field}'
                     }, status=400)
             
-            # Verificar si la estación existe usando consulta directa
-            with connection.cursor() as cursor:
-                cursor.execute("SELECT 1 FROM user_stations WHERE station_id = %s", [data['station_id']])
-                station_exists = cursor.fetchone()
-            
-            if not station_exists:
+            # Verificar si la estación existe
+            try:
+                station = UserStation.objects.get(station_id=data['station_id'])
+            except UserStation.DoesNotExist:
                 return JsonResponse({
                     'status': 'error',
                     'message': 'Estación no encontrada'
                 }, status=404)
             
-            # Insertar datos usando consulta directa
-            with connection.cursor() as cursor:
-                cursor.execute("""
-                    INSERT INTO station_data 
-                    (station_id, temperatura, humedad, presion, gas_detectado, voltaje_mq135, indice_uv, nivel_uv, timestamp)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-                """, [
-                    data['station_id'],
-                    data['temperatura'],
-                    data['humedad'],
-                    data['presion'],
-                    data.get('gas_detectado', False),
-                    data.get('voltaje_mq135'),
-                    data.get('indice_uv', 0.0),
-                    data.get('nivel_uv', 'Muy bajo'),
-                    timezone.now()
-                ])
+            # Crear nuevo registro
+            station_data = StationData(
+                station=station,
+                temperatura=data['temperatura'],
+                humedad=data['humedad'],
+                presion=data['presion'],
+                gas_detectado=data.get('gas_detectado', False),
+                voltaje_mq135=data.get('voltaje_mq135'),
+                indice_uv=data.get('indice_uv', 0.0),
+                nivel_uv=data.get('nivel_uv', 'Muy bajo')
+            )
+            station_data.save()
             
             return JsonResponse({
                 'status': 'success',
                 'message': 'Datos recibidos correctamente',
-                'timestamp': timezone.now().isoformat()
+                'id': station_data.id,
+                'timestamp': station_data.timestamp.isoformat()
             })
             
         except json.JSONDecodeError:
