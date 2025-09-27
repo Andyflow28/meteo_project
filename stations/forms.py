@@ -63,10 +63,3 @@ class StationDataForm(forms.ModelForm):
                 'placeholder': 'Nivel UV (Muy bajo, Bajo, Moderado, etc.)'
             }),
         }
-        
-    def clean_indice_uv(self):
-        """Validación para el índice UV"""
-        indice_uv = self.cleaned_data.get('indice_uv')
-        if indice_uv is not None and indice_uv < 0:
-            raise forms.ValidationError("El índice UV no puede ser negativo")
-        return indice_uv

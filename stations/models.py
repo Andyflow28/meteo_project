@@ -10,24 +10,15 @@ class UserStation(models.Model):
         on_delete=models.CASCADE,
         db_column='user_id'
     )
-    created_at = models.DateTimeField(auto_now_add=True)
     description = models.TextField(blank=True, null=True)
     
     class Meta:
         db_table = 'user_stations'
         verbose_name = 'Estación de usuario'
         verbose_name_plural = 'Estaciones de usuarios'
-        ordering = ['-created_at']
 
     def __str__(self):
         return f"{self.station_id} - {self.location}"
-
-    def save(self, *args, **kwargs):
-        # Actualizar el estado del usuario
-        if not self.user.has_station:
-            self.user.has_station = True
-            self.user.save()
-        super().save(*args, **kwargs)
 
 class StationData(models.Model):
     id = models.AutoField(primary_key=True)

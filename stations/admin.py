@@ -3,11 +3,9 @@ from .models import UserStation, StationData
 
 @admin.register(UserStation)
 class UserStationAdmin(admin.ModelAdmin):
-    list_display = ('station_id', 'location', 'user', 'created_at')
-    list_filter = ('created_at', 'user')
+    list_display = ('station_id', 'location', 'user')
+    list_filter = ('user',)
     search_fields = ('station_id', 'location', 'user__username', 'user__email')
-    date_hierarchy = 'created_at'
-    readonly_fields = ('created_at',)
 
 @admin.register(StationData)
 class StationDataAdmin(admin.ModelAdmin):
