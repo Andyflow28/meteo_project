@@ -29,9 +29,11 @@
             --nature-dark-green: #228B22;
             --background-dark: #0A0F2D;
             --card-bg: rgba(255, 255, 255, 0.08);
-            /* Variables responsivas */
-            --mobile-font-scale: 0.7;
-            --tablet-font-scale: 0.85;
+            --uv-low: #4CD964;
+            --uv-moderate: #FFCC00;
+            --uv-high: #FF9500;
+            --uv-very-high: #FF3B30;
+            --uv-extreme: #8B00FF;
         }
         
         body {
@@ -57,17 +59,6 @@
             position: relative;
             overflow: hidden;
             padding: 10px 0;
-        }
-        
-        .showroom-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" opacity="0.1"><path d="M50,15 A35,35 0 1,1 50,85 A35,35 0 1,1 50,15 Z" fill="white"/><circle cx="50" cy="50" r="10" fill="white"/></svg>') repeat;
-            animation: float 20s infinite linear;
         }
         
         .logo-container {
@@ -126,21 +117,6 @@
             padding: 20px 15px;
         }
         
-        .main-data-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.1), transparent);
-            transition: left 0.8s;
-        }
-        
-        .main-data-card:hover::before {
-            left: 100%;
-        }
-        
         .main-data-card:hover {
             transform: translateY(-3px);
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
@@ -187,16 +163,6 @@
             text-align: center;
         }
         
-        .sensor-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--sun-gold), var(--rain-blue), var(--nature-green));
-        }
-        
         .sensor-card:hover {
             transform: translateY(-3px);
             background: rgba(255, 255, 255, 0.12);
@@ -222,6 +188,10 @@
         
         .gas-icon {
             color: var(--nature-green);
+        }
+        
+        .uv-icon {
+            color: var(--uv-high);
         }
         
         .sensor-value {
@@ -264,92 +234,30 @@
                 transform: scale(1);
             }
         }
-        /* Efectos de partículas */
+        /* Colores para niveles UV */
         
-        .particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            pointer-events: none;
+        .uv-muy-bajo {
+            color: var(--uv-low);
         }
         
-        .particle {
-            position: absolute;
-            border-radius: 50%;
-            animation: float 8s infinite linear;
+        .uv-bajo {
+            color: var(--uv-low);
         }
         
-        .sun-particle {
-            width: 3px;
-            height: 3px;
-            background: var(--sun-gold);
-            box-shadow: 0 0 8px var(--sun-gold);
+        .uv-moderado {
+            color: var(--uv-moderate);
         }
         
-        .rain-particle {
-            width: 2px;
-            height: 8px;
-            background: var(--rain-blue);
-            box-shadow: 0 0 4px var(--rain-blue);
+        .uv-alto {
+            color: var(--uv-high);
         }
         
-        @keyframes float {
-            0% {
-                transform: translateY(100vh) translateX(0);
-                opacity: 0;
-            }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-100px) translateX(100px);
-                opacity: 0;
-            }
-        }
-        /* Botones de control responsive */
-        
-        .control-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid var(--tech-cyan);
-            color: var(--tech-cyan);
-            border-radius: 20px;
-            padding: 8px 20px;
-            font-family: 'Orbitron', monospace;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            margin: 5px;
-            font-size: 0.9rem;
-            width: 100%;
-            max-width: 250px;
+        .uv-muy-alto {
+            color: var(--uv-very-high);
         }
         
-        .control-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 206, 209, 0.2), transparent);
-            transition: left 0.5s;
-        }
-        
-        .control-btn:hover::before {
-            left: 100%;
-        }
-        
-        .control-btn:hover {
-            background: var(--tech-cyan);
-            color: #000;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 206, 209, 0.4);
+        .uv-extremo {
+            color: var(--uv-extreme);
         }
         
         .no-data {
@@ -372,28 +280,7 @@
         .quality-poor {
             color: #FF6B6B;
         }
-        /* Footer responsive */
-        
-        .company-footer {
-            background: rgba(0, 0, 0, 0.7);
-            border-top: 1px solid var(--tech-cyan);
-            padding: 15px 0;
-            margin-top: 30px;
-        }
-        
-        .social-links a {
-            color: var(--tech-cyan);
-            font-size: 1.3rem;
-            margin: 0 8px;
-            transition: all 0.3s ease;
-        }
-        
-        .social-links a:hover {
-            color: var(--sun-gold);
-            transform: translateY(-3px);
-        }
         /* Media Queries para Responsividad */
-        /* Pantallas pequeñas (móviles) */
         
         @media (max-width: 576px) {
             .main-data-card h2 {
@@ -411,29 +298,7 @@
                 margin: 5px 0;
                 padding: 10px;
             }
-            /* ESPECÍFICO para la tarjeta de información de estación */
-            .station-info-card .row {
-                margin: 0;
-            }
-            .station-info-card .col-6 {
-                margin-bottom: 15px;
-            }
-            .station-info-card .sensor-value {
-                font-size: 1rem !important;
-                margin-bottom: 5px;
-            }
-            /* Asegurar que el texto no se corte */
-            .company-name,
-            .tagline,
-            h2,
-            h3,
-            h4,
-            h5 {
-                word-wrap: break-word;
-                overflow-wrap: break-word;
-            }
         }
-        /* Pantallas medianas (tabletas) */
         
         @media (min-width: 577px) and (max-width: 768px) {
             .company-name {
@@ -445,51 +310,11 @@
             .sensor-value {
                 font-size: 1.7rem;
             }
-            .main-data-card {
-                padding: 25px 20px;
-            }
-        }
-        /* Pantallas grandes */
-        
-        @media (max-width: 768px) {
-            .container-fluid {
-                padding-left: 5px;
-                padding-right: 5px;
-            }
-            .main-data-card {
-                margin: 10px 5px;
-                padding: 15px 10px;
-            }
-        }
-        /* Ajustes específicos para orientación horizontal en móviles */
-        
-        @media (max-height: 500px) and (orientation: landscape) {
-            .main-data-card {
-                padding: 10px 15px;
-                margin: 5px 0;
-            }
-            .main-sensor-value {
-                font-size: 1.8rem;
-            }
-            .sensor-value {
-                font-size: 1.2rem;
-            }
-            .sensor-icon {
-                font-size: 1.5rem;
-                margin-bottom: 5px;
-            }
-            .company-footer {
-                margin-top: 15px;
-                padding: 10px 0;
-            }
         }
     </style>
 </head>
 
 <body>
-    <!-- Partículas de fondo con temática de sol y lluvia -->
-    <div class="particles" id="particles"></div>
-
     <!-- Header del Showroom -->
     <header class="showroom-header py-2">
         <div class="container">
@@ -529,10 +354,10 @@
                         <div class="col-12 col-md-4 mb-3 mb-md-0">
                             <div class="sensor-card">
                                 <div class="sensor-icon temperature-icon">
-                                    <i class="fas fa-sun"></i>
+                                    <i class="fas fa-thermometer-half"></i>
                                 </div>
                                 <div class="main-sensor-value {% if not has_data %}no-data{% endif %}" id="current-temperature">
-                                    {% if latest_data %} {% if latest_data.temperature_aht20 %} {{ latest_data.temperature_aht20|floatformat:1 }} {% elif latest_data.temperature_bmp280 %} {{ latest_data.temperature_bmp280|floatformat:1 }} {% else %} -- {% endif %} {% else %} -- {% endif%}
+                                    {% if latest_data and latest_data.temperatura %}{{ latest_data.temperatura|floatformat:1 }}{% else %}--{% endif %}
                                 </div>
                                 <div class="sensor-unit">°C</div>
                                 <small>TEMPERATURA</small>
@@ -546,7 +371,7 @@
                                     <i class="fas fa-tint"></i>
                                 </div>
                                 <div class="main-sensor-value {% if not has_data %}no-data{% endif %}" id="current-humidity">
-                                    {% if latest_data and latest_data.humidity_aht20 %} {{ latest_data.humidity_aht20|floatformat:1 }} {% else %} -- {% endif %}
+                                    {% if latest_data and latest_data.humedad %}{{ latest_data.humedad|floatformat:1 }}{% else %}--{% endif %}
                                 </div>
                                 <div class="sensor-unit">%</div>
                                 <small>HUMEDAD</small>
@@ -560,7 +385,7 @@
                                     <i class="fas fa-tachometer-alt"></i>
                                 </div>
                                 <div class="main-sensor-value {% if not has_data %}no-data{% endif %}" id="current-pressure">
-                                    {% if latest_data and latest_data.pressure_bmp280 %} {{ latest_data.pressure_bmp280|floatformat:0 }} {% else %} -- {% endif %}
+                                    {% if latest_data and latest_data.presion %}{{ latest_data.presion|floatformat:0 }}{% else %}--{% endif %}
                                 </div>
                                 <div class="sensor-unit">hPa</div>
                                 <small>PRESIÓN ATMOSFÉRICA</small>
@@ -577,22 +402,29 @@
                                 </h4>
                                 <div class="row text-center">
                                     <div class="col-6 col-md-3 mb-3">
-                                        <div class="sensor-value" id="station-id">albacsd4</div>
+                                        <div class="sensor-value" id="station-id">
+                                            {% if station %}{{ station.station_id }}{% else %}--{% endif %}
+                                        </div>
                                         <small class="d-block">ID ESTACIÓN</small>
                                     </div>
                                     <div class="col-6 col-md-3 mb-3">
-                                        <div class="sensor-value" id="station-location">prueba</div>
+                                        <div class="sensor-value" id="station-location">
+                                            {% if station %}{{ station.location }}{% else %}--{% endif %}
+                                        </div>
                                         <small class="d-block">UBICACIÓN</small>
                                     </div>
                                     <div class="col-6 col-md-3 mb-3">
                                         <div class="sensor-value" id="last-update">
-                                            02:28:51<br>
-                                            <small>24/09/2023</small>
+                                            {% if latest_data %} {{ latest_data.timestamp|time:"H:i:s" }}<br>
+                                            <small>{{ latest_data.timestamp|date:"d/m/Y" }}</small> {% else %} --
+                                            <br><small>--/--/----</small> {% endif %}
                                         </div>
                                         <small class="d-block">ÚLTIMA ACTUALIZACIÓN</small>
                                     </div>
                                     <div class="col-6 col-md-3 mb-3">
-                                        <div class="sensor-value quality-excellent" id="data-quality">95%</div>
+                                        <div class="sensor-value {% if has_data %}quality-excellent{% else %}quality-poor{% endif %}" id="data-quality">
+                                            {% if has_data %}95%{% else %}0%{% endif %}
+                                        </div>
                                         <small class="d-block">CALIDAD DE DATOS</small>
                                     </div>
                                 </div>
@@ -608,51 +440,50 @@
             <div class="col-12 col-lg-8">
                 <div class="main-data-card p-3 p-md-4">
                     <h3 class="cyber-font text-center mb-3 mb-md-4">
-                        <i class="fas fa-microchip"></i> SENSORES DE CALIDAD DEL AIRE
+                        <i class="fas fa-microchip"></i> SENSORES AMBIENTALES
                     </h3>
 
                     <div class="row">
-                        <!-- Sensor MQ-2 -->
+                        <!-- Calidad del Aire -->
                         <div class="col-12 col-md-6 mb-3 mb-md-0">
                             <div class="sensor-card">
-                                <h5><i class="fas fa-wind gas-icon"></i> SENSOR MQ-2 (GASES INFLAMABLES)</h5>
+                                <h5><i class="fas fa-wind gas-icon"></i> CALIDAD DEL AIRE</h5>
                                 <div class="row text-center">
                                     <div class="col-6">
-                                        <div class="sensor-value {% if not has_data %}no-data{% endif %}" id="mq2-voltage">
-                                            {% if latest_data and latest_data.voltage_mq2 %} {{ latest_data.voltage_mq2|floatformat:2 }} {% else %} -- {% endif %}
+                                        <div class="sensor-value {% if not has_data %}no-data{% endif %}" id="gas-detected">
+                                            {% if latest_data and latest_data.gas_detectado is not None %} {% if latest_data.gas_detectado %}
+                                            <span class="text-danger">DETECTADO</span> {% else %}
+                                            <span class="text-success">NORMAL</span> {% endif %} {% else %}--{% endif %}
                                         </div>
-                                        <small>VOLTAJE (V)</small>
+                                        <small>GAS DETECTADO</small>
                                     </div>
                                     <div class="col-6">
-                                        <div class="sensor-value {% if not has_data %}no-data{% endif %}" id="mq2-digital">
-                                            {% if latest_data and latest_data.digital_mq2 is not None %} {% if latest_data.digital_mq2 %}
-                                            <span class="text-success">DETECTADO</span> {% else %}
-                                            <span class="text-warning">NORMAL</span> {% endif %} {% else %} -- {% endif %}
+                                        <div class="sensor-value {% if not has_data %}no-data{% endif %}" id="mq135-voltage">
+                                            {% if latest_data and latest_data.voltaje_mq135 %}{{ latest_data.voltaje_mq135|floatformat:2 }}V{% else %}--{% endif %}
                                         </div>
-                                        <small>ESTADO</small>
+                                        <small>VOLTAJE MQ135</small>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Sensor MQ-135 -->
+                        <!-- Radiación UV -->
                         <div class="col-12 col-md-6">
                             <div class="sensor-card">
-                                <h5><i class="fas fa-smog gas-icon"></i> SENSOR MQ-135 (CALIDAD DEL AIRE)</h5>
+                                <h5><i class="fas fa-sun uv-icon"></i> RADIACIÓN UV</h5>
                                 <div class="row text-center">
                                     <div class="col-6">
-                                        <div class="sensor-value {% if not has_data %}no-data{% endif %}" id="mq135-voltage">
-                                            {% if latest_data and latest_data.voltage_mq135 %} {{ latest_data.voltage_mq135|floatformat:2 }} {% else %} -- {% endif %}
+                                        <div class="sensor-value {% if not has_data %}no-data{% endif %}" id="uv-index">
+                                            {% if latest_data and latest_data.indice_uv is not None %}{{ latest_data.indice_uv|floatformat:1 }}{% else %}--{% endif %}
                                         </div>
-                                        <small>VOLTAJE (V)</small>
+                                        <small>ÍNDICE UV</small>
                                     </div>
                                     <div class="col-6">
-                                        <div class="sensor-value {% if not has_data %}no-data{% endif %}" id="mq135-digital">
-                                            {% if latest_data and latest_data.digital_mq135 is not None %} {% if latest_data.digital_mq135 %}
-                                            <span class="text-success">ALERTA</span> {% else %}
-                                            <span class="text-warning">NORMAL</span> {% endif %} {% else %} -- {% endif %}
+                                        <div class="sensor-value {% if not has_data %}no-data{% endif %} 
+                                            {% if latest_data and latest_data.nivel_uv %}uv-{{ latest_data.nivel_uv|lower|cut:" " }}{% endif %}" id="uv-level">
+                                            {% if latest_data and latest_data.nivel_uv %}{{ latest_data.nivel_uv }}{% else %}--{% endif %}
                                         </div>
-                                        <small>CALIDAD</small>
+                                        <small>NIVEL UV</small>
                                     </div>
                                 </div>
                             </div>
@@ -666,13 +497,13 @@
         <div class="row justify-content-center mt-3 mt-md-4">
             <div class="col-12 col-lg-8 text-center">
                 <div class="d-flex flex-column flex-md-row justify-content-center align-items-center">
-                    <button class="control-btn me-md-3 mb-2 mb-md-0" onclick="toggleFullscreen()">
+                    <button class="btn btn-outline-info me-md-3 mb-2 mb-md-0 control-btn" onclick="toggleFullscreen()">
                         <i class="fas fa-expand"></i> PANTALLA COMPLETA
                     </button>
-                    <button class="control-btn me-md-3 mb-2 mb-md-0" onclick="refreshData()">
+                    <button class="btn btn-outline-success me-md-3 mb-2 mb-md-0 control-btn" onclick="refreshData()">
                         <i class="fas fa-sync-alt"></i> ACTUALIZAR DATOS
                     </button>
-                    <button class="control-btn" onclick="toggleAutoRefresh()">
+                    <button class="btn btn-outline-warning control-btn" onclick="toggleAutoRefresh()">
                         <i class="fas fa-clock"></i> <span id="auto-refresh-text">AUTO: ON</span>
                     </button>
                 </div>
@@ -681,7 +512,7 @@
     </div>
 
     <!-- Footer de la empresa -->
-    <footer class="company-footer">
+    <footer class="company-footer mt-4">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-12 col-md-6 text-center text-md-start mb-3 mb-md-0">
@@ -711,29 +542,6 @@
         // Variables globales
         let autoRefreshInterval = null;
         let isAutoRefreshEnabled = true;
-
-        // Configuración de partículas de fondo con temática de sol y lluvia
-        function createParticles() {
-            const particlesContainer = document.getElementById('particles');
-            // Partículas de sol (doradas)
-            for (let i = 0; i < 15; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle sun-particle';
-                particle.style.left = Math.random() * 100 + 'vw';
-                particle.style.animationDelay = Math.random() * 8 + 's';
-                particle.style.animationDuration = (6 + Math.random() * 6) + 's';
-                particlesContainer.appendChild(particle);
-            }
-            // Partículas de lluvia (azules)
-            for (let i = 0; i < 25; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle rain-particle';
-                particle.style.left = Math.random() * 100 + 'vw';
-                particle.style.animationDelay = Math.random() * 8 + 's';
-                particle.style.animationDuration = (4 + Math.random() * 4) + 's';
-                particlesContainer.appendChild(particle);
-            }
-        }
 
         // Actualizar reloj en tiempo real
         function updateClock() {
@@ -782,17 +590,14 @@
 
                 // Función para formatear valores
                 const formatValue = (value, decimals = 1) => {
-                    if (value === null || value === undefined || value === '--') return '--';
+                    if (value === null || value === undefined) return '--';
                     return parseFloat(value).toFixed(decimals);
                 };
 
                 // Actualizar datos principales
-                document.getElementById('current-temperature').textContent =
-                    formatValue(sd.temperature_aht20 || sd.temperature_bmp280);
-                document.getElementById('current-humidity').textContent =
-                    formatValue(sd.humidity_aht20);
-                document.getElementById('current-pressure').textContent =
-                    formatValue(sd.pressure_bmp280, 0);
+                document.getElementById('current-temperature').textContent = formatValue(sd.temperatura);
+                document.getElementById('current-humidity').textContent = formatValue(sd.humedad);
+                document.getElementById('current-pressure').textContent = formatValue(sd.presion, 0);
 
                 // Información de la estación
                 if (station && station.station_id) {
@@ -810,16 +615,24 @@
                 document.getElementById('data-quality').textContent = '95%';
                 document.getElementById('data-quality').className = 'sensor-value quality-excellent';
 
-                // Sensores adicionales
-                document.getElementById('mq2-voltage').textContent = formatValue(sd.voltage_mq2, 2);
-                document.getElementById('mq2-digital').innerHTML =
-                    sd.digital_mq2 !== null ?
-                    (sd.digital_mq2 ? '<span class="text-success">DETECTADO</span>' : '<span class="text-warning">NORMAL</span>') : '--';
+                // Sensores adicionales - Calidad del Aire
+                document.getElementById('gas-detected').innerHTML =
+                    sd.gas_detectado !== null && sd.gas_detectado !== undefined ?
+                    (sd.gas_detectado ?
+                        '<span class="text-danger">DETECTADO</span>' :
+                        '<span class="text-success">NORMAL</span>') : '--';
 
-                document.getElementById('mq135-voltage').textContent = formatValue(sd.voltage_mq135, 2);
-                document.getElementById('mq135-digital').innerHTML =
-                    sd.digital_mq135 !== null ?
-                    (sd.digital_mq135 ? '<span class="text-success">ALERTA</span>' : '<span class="text-warning">NORMAL</span>') : '--';
+                document.getElementById('mq135-voltage').textContent =
+                    sd.voltaje_mq135 !== null ? formatValue(sd.voltaje_mq135, 2) + 'V' : '--';
+
+                // Sensores adicionales - Radiación UV
+                document.getElementById('uv-index').textContent = formatValue(sd.indice_uv, 1);
+
+                const uvLevelElement = document.getElementById('uv-level');
+                uvLevelElement.textContent = sd.nivel_uv || '--';
+                // Aplicar clase de color según el nivel UV
+                uvLevelElement.className = 'sensor-value ' +
+                    (sd.nivel_uv ? 'uv-' + sd.nivel_uv.toLowerCase().replace(' ', '-') : 'no-data');
 
                 // Actualizar estado de conexión
                 document.getElementById('status-indicator').className = 'status-indicator status-live';
@@ -838,6 +651,15 @@
             document.getElementById('status-text').textContent = 'SIN DATOS';
             document.getElementById('data-quality').className = 'sensor-value quality-poor';
             document.getElementById('data-quality').textContent = '0%';
+
+            // Resetear todos los valores a --
+            const valueElements = document.querySelectorAll('.main-sensor-value, .sensor-value');
+            valueElements.forEach(el => {
+                if (el.id !== 'data-quality') {
+                    el.textContent = '--';
+                    el.className = el.className.replace(/uv-[a-z-]+/, '') + ' no-data';
+                }
+            });
         }
 
         // Mostrar mensaje de error
@@ -893,14 +715,17 @@
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', function() {
-            createParticles();
             updateClock();
             setInterval(updateClock, 1000);
 
-            // Si hay datos iniciales, cargar actualizaciones automáticamente
+            // Iniciar actualización automática si hay datos
+            { %
+                if has_data %
+            }
+            startAutoRefresh(); { % endif %
+            }
 
-
-            // Cargar datos iniciales via API (para asegurar que estén actualizados)
+            // Cargar datos iniciales via API
             loadLatestData();
 
             // Efectos de teclado para presentación
@@ -928,7 +753,7 @@
                     stopAutoRefresh();
                 } else if (isAutoRefreshEnabled) {
                     startAutoRefresh();
-                    loadLatestData(); // Cargar datos inmediatamente al volver
+                    loadLatestData();
                 }
             });
         });

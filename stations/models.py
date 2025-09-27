@@ -32,21 +32,14 @@ class UserStation(models.Model):
 class StationData(models.Model):
     id = models.AutoField(primary_key=True)
     
-    # Datos del sensor AHT20
-    temperature_aht20 = models.FloatField(null=True, blank=True)
-    humidity_aht20 = models.FloatField(null=True, blank=True)
-    
-    # Datos del sensor BMP280
-    temperature_bmp280 = models.FloatField(null=True, blank=True)
-    pressure_bmp280 = models.FloatField(null=True, blank=True)
-    
-    # Datos del sensor MQ-2
-    voltage_mq2 = models.FloatField(null=True, blank=True)
-    digital_mq2 = models.BooleanField(null=True, blank=True)
-    
-    # Datos del sensor MQ-135
-    voltage_mq135 = models.FloatField(null=True, blank=True)
-    digital_mq135 = models.BooleanField(null=True, blank=True)
+    # Nuevos campos según la estructura JSON
+    temperatura = models.FloatField(null=True, blank=True)
+    humedad = models.FloatField(null=True, blank=True)
+    presion = models.FloatField(null=True, blank=True)
+    gas_detectado = models.BooleanField(null=True, blank=True)
+    voltaje_mq135 = models.FloatField(null=True, blank=True)
+    indice_uv = models.FloatField(null=True, blank=True)
+    nivel_uv = models.CharField(max_length=50, null=True, blank=True)
     
     station = models.ForeignKey(
         UserStation, 
@@ -66,15 +59,13 @@ class StationData(models.Model):
     
     @property
     def temperature(self):
-        """Retorna la temperatura preferida (AHT20 tiene prioridad)"""
-        return self.temperature_aht20 or self.temperature_bmp280
+        """Retorna la temperatura (alias para compatibilidad)"""
+        return self.temperatura
     
     @property
     def has_air_quality_data(self):
         """Verifica si tiene datos de calidad del aire"""
         return any([
-            self.voltage_mq2 is not None,
-            self.digital_mq2 is not None,
-            self.voltage_mq135 is not None,
-            self.digital_mq135 is not None
+            self.gas_detectado is not None,
+            self.voltaje_mq135 is not None
         ])

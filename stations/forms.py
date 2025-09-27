@@ -25,18 +25,48 @@ class StationDataForm(forms.ModelForm):
     class Meta:
         model = StationData
         fields = [
-            'temperature_aht20', 'humidity_aht20',
-            'temperature_bmp280', 'pressure_bmp280',
-            'voltage_mq2', 'digital_mq2',
-            'voltage_mq135', 'digital_mq135'
+            'temperatura', 'humedad', 'presion', 
+            'gas_detectado', 'voltaje_mq135', 
+            'indice_uv', 'nivel_uv'
         ]
         widgets = {
-            'temperature_aht20': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.1'}),
-            'humidity_aht20': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.1'}),
-            'temperature_bmp280': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.1'}),
-            'pressure_bmp280': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.1'}),
-            'voltage_mq2': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
-            'digital_mq2': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
-            'voltage_mq135': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
-            'digital_mq135': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'temperatura': forms.NumberInput(attrs={
+                'class': 'form-control', 
+                'step': '0.1',
+                'placeholder': 'Temperatura en °C'
+            }),
+            'humedad': forms.NumberInput(attrs={
+                'class': 'form-control', 
+                'step': '0.1',
+                'placeholder': 'Humedad relativa en %'
+            }),
+            'presion': forms.NumberInput(attrs={
+                'class': 'form-control', 
+                'step': '0.1',
+                'placeholder': 'Presión atmosférica en hPa'
+            }),
+            'gas_detectado': forms.CheckboxInput(attrs={
+                'class': 'form-check-input'
+            }),
+            'voltaje_mq135': forms.NumberInput(attrs={
+                'class': 'form-control', 
+                'step': '0.01',
+                'placeholder': 'Voltaje del sensor MQ135'
+            }),
+            'indice_uv': forms.NumberInput(attrs={
+                'class': 'form-control', 
+                'step': '0.1',
+                'placeholder': 'Índice UV'
+            }),
+            'nivel_uv': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nivel UV (Muy bajo, Bajo, Moderado, etc.)'
+            }),
         }
+        
+    def clean_indice_uv(self):
+        """Validación para el índice UV"""
+        indice_uv = self.cleaned_data.get('indice_uv')
+        if indice_uv is not None and indice_uv < 0:
+            raise forms.ValidationError("El índice UV no puede ser negativo")
+        return indice_uv

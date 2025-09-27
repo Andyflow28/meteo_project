@@ -16,110 +16,6 @@ import json
 
 @never_cache
 def public_showroom(request):
-    """Vista pública para showroom - usando consultas directas a station_data"""
-    try:
-        # Consulta directa a la tabla station_data
-        with connection.cursor() as cursor:
-            cursor.execute("""
-                SELECT * FROM station_data 
-                ORDER BY timestamp DESC 
-                LIMIT 1
-            """)
-            columns = [col[0] for col in cursor.description]
-            latest_data_row = cursor.fetchone()
-        
-        latest_data = None
-        if latest_data_row:
-            latest_data = dict(zip(columns, latest_data_row))
-        
-        # Obtener información de la estación si existe
-        station_info = None
-        if latest_data and 'station_id' in latest_data:
-            with connection.cursor() as cursor:
-                cursor.execute("""
-                    SELECT * FROM user_stations 
-                    WHERE station_id = %s
-                """, [latest_data['station_id']])
-                station_columns = [col[0] for col in cursor.description]
-                station_row = cursor.fetchone()
-                if station_row:
-                    station_info = dict(zip(station_columns, station_row))
-        
-        context = {
-            'latest_data': latest_data,
-            'station': station_info,
-            'has_data': latest_data is not None,
-            'timestamp': timezone.now(),
-        }
-        
-        return render(request, 'stations/public_showroom.html', context)
-        
-    except Exception as e:
-        print(f"Error en public_showroom: {e}")
-        context = {
-            'latest_data': None,
-            'station': None,
-            'has_data': False,
-            'timestamp': timezone.now(),
-        }
-        return render(request, 'stations/public_showroom.html', context)
-
-@never_cache
-def public_latest_data_api(request):
-    """API pública usando consultas SQL directas"""
-    try:
-        with connection.cursor() as cursor:
-            cursor.execute("""
-                SELECT * FROM station_data 
-                ORDER BY timestamp DESC 
-                LIMIT 1
-            """)
-            columns = [col[0] for col in cursor.description]
-            latest_data_row = cursor.fetchone()
-        
-        if latest_data_row:
-            latest_data = dict(zip(columns, latest_data_row))
-            
-            # Obtener información de la estación
-            station_info = {}
-            if 'station_id' in latest_data:
-                with connection.cursor() as cursor:
-                    cursor.execute("""
-                        SELECT station_id, location, description 
-                        FROM user_stations 
-                        WHERE station_id = %s
-                    """, [latest_data['station_id']])
-                    station_row = cursor.fetchone()
-                    if station_row:
-                        station_info = {
-                            'station_id': station_row[0],
-                            'location': station_row[1],
-                            'description': station_row[2] if len(station_row) > 2 else ''
-                        }
-            
-            data = {
-                'station_data': latest_data,
-                'station_info': station_info,
-                'timestamp': timezone.now().isoformat(),
-                'status': 'success'
-            }
-        else:
-            data = {
-                'station_data': {},
-                'station_info': {},
-                'timestamp': timezone.now().isoformat(),
-                'message': 'No hay datos disponibles',
-                'status': 'no_data'
-            }
-            
-        return JsonResponse(data)
-        
-    except Exception as e:
-        return JsonResponse({
-            'error': str(e),
-            'timestamp': timezone.now().isoformat(),
-            'status': 'error'
-        }, status=500)
     """Vista pública para showroom - muestra el registro más reciente de station_data"""
     try:
         # Obtener el registro más reciente de TODAS las estaciones con optimización
@@ -144,6 +40,7 @@ def public_latest_data_api(request):
         }
         return render(request, 'stations/public_showroom.html', context)
 
+
 @never_cache
 def public_latest_data_api(request):
     """API pública que devuelve el registro más reciente de cualquier estación"""
@@ -155,14 +52,13 @@ def public_latest_data_api(request):
             station = latest_data.station
             data = {
                 'station_data': {
-                    'temperature_aht20': latest_data.temperature_aht20,
-                    'temperature_bmp280': latest_data.temperature_bmp280,
-                    'humidity_aht20': latest_data.humidity_aht20,
-                    'pressure_bmp280': latest_data.pressure_bmp280,
-                    'voltage_mq2': latest_data.voltage_mq2,
-                    'digital_mq2': latest_data.digital_mq2,
-                    'voltage_mq135': latest_data.voltage_mq135,
-                    'digital_mq135': latest_data.digital_mq135,
+                    'temperatura': latest_data.temperatura,
+                    'humedad': latest_data.humedad,
+                    'presion': latest_data.presion,
+                    'gas_detectado': latest_data.gas_detectado,
+                    'voltaje_mq135': latest_data.voltaje_mq135,
+                    'indice_uv': latest_data.indice_uv,
+                    'nivel_uv': latest_data.nivel_uv,
                     'timestamp': latest_data.timestamp.isoformat(),
                 },
                 'station_info': {
@@ -191,6 +87,7 @@ def public_latest_data_api(request):
             'status': 'error'
         }, status=500)
 
+
 @login_required
 def dashboard(request):
     try:
@@ -215,6 +112,7 @@ def dashboard(request):
         }
         return render(request, 'stations/dashboard.html', context)
 
+
 @login_required
 def add_station(request):
     if request.method == 'POST':
@@ -231,6 +129,7 @@ def add_station(request):
         form = UserStationForm()
     
     return render(request, 'stations/add_station.html', {'form': form})
+
 
 @login_required
 def station_detail(request, station_id):
@@ -251,6 +150,7 @@ def station_detail(request, station_id):
         'selected_days': days,
     }
     return render(request, 'stations/station_detail.html', context)
+
 
 @login_required
 def add_station_data(request, station_id):
@@ -275,6 +175,7 @@ def add_station_data(request, station_id):
     }
     return render(request, 'stations/add_station_data.html', context)
 
+
 @login_required
 def delete_station(request, station_id):
     station = get_object_or_404(UserStation, station_id=station_id, user=request.user)
@@ -290,9 +191,11 @@ def delete_station(request, station_id):
     }
     return render(request, 'stations/delete_station.html', context)
 
+
 def showroom_dashboard(request):
     """Vista para el showroom comercial"""
     return render(request, 'stations/showroom_dashboard.html')
+
 
 def realtime_data_api(request):
     """API para datos en tiempo real del showroom"""
@@ -319,27 +222,26 @@ def realtime_data_api(request):
             latest_data = StationData.objects.filter(station=station).order_by('-timestamp').first()
             
             if latest_data:
-                # Usar temperatura de AHT20 si está disponible, si no de BMP280
-                temperature = latest_data.temperature_aht20
-                if temperature is None:
-                    temperature = latest_data.temperature_bmp280
-                
                 station_data = {
                     'station_id': station.station_id,
                     'location': station.location,
-                    'temperature': temperature,
-                    'humidity': latest_data.humidity_aht20,
-                    'pressure': latest_data.pressure_bmp280,
+                    'temperature': latest_data.temperatura,
+                    'humidity': latest_data.humedad,
+                    'pressure': latest_data.presion,
+                    'gas_detectado': latest_data.gas_detectado,
+                    'voltaje_mq135': latest_data.voltaje_mq135,
+                    'indice_uv': latest_data.indice_uv,
+                    'nivel_uv': latest_data.nivel_uv,
                     'last_update': latest_data.timestamp.isoformat(),
                     'status': 'online',
                     'quality': 95,
                 }
                 
-                if station_data['temperature']:
+                if station_data['temperature'] is not None:
                     temperatures.append(station_data['temperature'])
-                if station_data['humidity']:
+                if station_data['humidity'] is not None:
                     humidities.append(station_data['humidity'])
-                if station_data['pressure']:
+                if station_data['pressure'] is not None:
                     pressures.append(station_data['pressure'])
                 
                 data['stations'].append(station_data)
@@ -356,3 +258,66 @@ def realtime_data_api(request):
         
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+@csrf_exempt
+def api_receive_data(request):
+    """API para recibir datos de las estaciones (POST)"""
+    if request.method == 'POST':
+        try:
+            # Parsear JSON
+            data = json.loads(request.body)
+            
+            # Validar campos requeridos
+            required_fields = ['station_id', 'temperatura', 'humedad', 'presion']
+            for field in required_fields:
+                if field not in data:
+                    return JsonResponse({
+                        'status': 'error',
+                        'message': f'Campo requerido faltante: {field}'
+                    }, status=400)
+            
+            # Buscar la estación
+            try:
+                station = UserStation.objects.get(station_id=data['station_id'])
+            except UserStation.DoesNotExist:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Estación no encontrada'
+                }, status=404)
+            
+            # Crear nuevo registro
+            station_data = StationData(
+                station=station,
+                temperatura=data['temperatura'],
+                humedad=data['humedad'],
+                presion=data['presion'],
+                gas_detectado=data.get('gas_detectado', False),
+                voltaje_mq135=data.get('voltaje_mq135'),
+                indice_uv=data.get('indice_uv', 0.0),
+                nivel_uv=data.get('nivel_uv', 'Muy bajo')
+            )
+            station_data.save()
+            
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Datos recibidos correctamente',
+                'id': station_data.id,
+                'timestamp': station_data.timestamp.isoformat()
+            })
+            
+        except json.JSONDecodeError:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'JSON inválido'
+            }, status=400)
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            }, status=500)
+    
+    return JsonResponse({
+        'status': 'error',
+        'message': 'Método no permitido'
+    }, status=405)
